@@ -15,6 +15,8 @@ import (
 	"github.com/spf13/cobra"
 	_ "github.com/tryanzu/core/board/events"
 	"github.com/tryanzu/core/core/shell"
+	"github.com/tryanzu/core/docs"
+	_ "github.com/tryanzu/core/docs"
 	"github.com/tryanzu/core/modules/acl"
 	"github.com/tryanzu/core/modules/api"
 	"github.com/tryanzu/core/modules/assets"
@@ -52,6 +54,11 @@ func main() {
 			`%{color}%{time:15:04:05.000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}`,
 		)
 	)
+
+	// Programatically set swagger info
+	docs.SwaggerInfo.Title = "Anzu API"
+	docs.SwaggerInfo.Description = "The most rad, simple & reactive forum software out there since the Javascript revolution."
+	docs.SwaggerInfo.Version = "0.2.0"
 
 	backend := logging.NewLogBackend(os.Stderr, "", 0)
 	backendFormatter := logging.NewBackendFormatter(backend, format)

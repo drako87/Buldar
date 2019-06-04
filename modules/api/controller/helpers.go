@@ -16,6 +16,13 @@ func jsonErr(c *gin.Context, status int, message string) {
 	})
 }
 
+// HTTPErr godoc
+// @Summary Http error representation.
+type HTTPErr struct {
+	Message string `json:"message" example:"status bad request"`
+	Status  int    `json:"status" example:"400"`
+}
+
 func jsonBindErr(c *gin.Context, status int, message string, bindErr error) {
 	// This specific json error structure is handled
 	// by the frontend in a generic way so errors

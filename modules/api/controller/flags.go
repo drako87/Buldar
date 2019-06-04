@@ -18,23 +18,35 @@ type upsertFlagForm struct {
 	Content   string        `json:"content" binding:"max=255"`
 }
 
-// NewFlag endpoint.
+// NewFlag godoc
+// @Summary Flag an entity (post/comment)
+// @Accept json
+// @Produce json
+// @Success 200 {object} flags.Flag
+// @Header 200 {string} Authorization "Bearer $token"
+// @Failure 400 {object} controller.HTTPErr
+// @Failure 404 {object} controller.HTTPErr
+// @Failure 500 {object} controller.HTTPErr
+// @Router /flags [post]
 func NewFlag(c *gin.Context) {
 	var form upsertFlagForm
 	if err := c.BindJSON(&form); err != nil {
 		jsonBindErr(c, http.StatusBadRequest, "Invalid flag request, check parameters", err)
 		return
 	}
+
 	category, err := flags.CastCategory(form.Category)
 	if err != nil {
 		jsonErr(c, http.StatusBadRequest, "Invalid flag category")
 		return
 	}
+
 	usr := c.MustGet("user").(user.User)
 	if count := flags.TodaysCountByUser(deps.Container, usr.Id); count > 10 {
 		jsonErr(c, http.StatusPreconditionFailed, "Can't flag anymore for today")
 		return
 	}
+
 	flag, err := flags.UpsertFlag(deps.Container, flags.Flag{
 		UserID:    usr.Id,
 		RelatedID: form.RelatedID,
@@ -42,7 +54,6 @@ func NewFlag(c *gin.Context) {
 		Content:   form.Content,
 		Category:  category,
 	})
-
 	if err != nil {
 		jsonErr(c, http.StatusInternalServerError, err.Error())
 		return

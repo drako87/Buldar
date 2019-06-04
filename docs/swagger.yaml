@@ -1,0 +1,67 @@
+definitions:
+  controller.HTTPErr:
+    properties:
+      message:
+        example: status bad request
+        type: string
+      status:
+        example: 400
+        type: integer
+    type: object
+  flags.Flag:
+    properties:
+      category:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      related_id:
+        type: string
+      related_to:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+info:
+  contact: {}
+  license: {}
+paths:
+  /flags:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Authorization:
+              description: Bearer $token
+              type: string
+          schema:
+            $ref: '#/definitions/flags.Flag'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HTTPErr'
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.HTTPErr'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HTTPErr'
+            type: object
+      summary: Flag an entity (post/comment)

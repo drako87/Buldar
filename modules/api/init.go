@@ -2,6 +2,11 @@ package api
 
 import (
 	"context"
+	"fmt"
+	"html/template"
+	"log"
+	"net/http"
+	"os"
 	"os/signal"
 	"time"
 
@@ -9,19 +14,17 @@ import (
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/olebedev/config"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 	handle "github.com/tryanzu/core/board/legacy"
 	"github.com/tryanzu/core/board/realtime"
 	chttp "github.com/tryanzu/core/core/http"
+	"github.com/tryanzu/core/docs"
+	_ "github.com/tryanzu/core/docs"
 	"github.com/tryanzu/core/modules/api/controller"
 	"github.com/tryanzu/core/modules/api/controller/oauth"
 	"github.com/tryanzu/core/modules/api/controller/posts"
 	"github.com/tryanzu/core/modules/api/controller/users"
-
-	"fmt"
-	"html/template"
-	"log"
-	"net/http"
-	"os"
 )
 
 type Module struct {
@@ -41,6 +44,13 @@ type ModuleDI struct {
 }
 
 func (module *Module) Run(bindTo string) {
+	// programatically set swagger info
+	docs.SwaggerInfo.Title = "Anzu API"
+	docs.SwaggerInfo.Description = "The most rad, simple & reactive forum software out there since the Javascript revolution."
+	docs.SwaggerInfo.Version = "0.3.1"
+	docs.SwaggerInfo.Host = "localhost:3200"
+	docs.SwaggerInfo.BasePath = "/v1"
+
 	debug := true
 	environment, err := module.Dependencies.Config.String("environment")
 	if err != nil {
@@ -84,6 +94,8 @@ func (module *Module) Run(bindTo string) {
 	if debug == false {
 		router.Use(module.Middlewares.TrustIP())
 		router.Use(chttp.MaxAllowed(5))
+	} else {
+		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
 	/**
